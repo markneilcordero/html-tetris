@@ -1,0 +1,367 @@
+<!Doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tetris</title>
+<style>
+body { text-align: center; background: #222; color: white; font-family: sans-serif; }
+canvas { border: 2px solid white; display: block; margin: auto; }
+.container { display: flex; justify-content: center; align-items: flex-start; gap: 20px; }
+.preview { text-align: center; }
+</style>
+</head>
+<body>
+
+<h1>Tetris Game</h1>
+<h2>Score: <span id="score">0</span></h2>
+<h2>Level: <span id="level">1</span></h2>
+
+<div class="container">
+    <canvas id="tetris" width="300" height="600"></canvas>
+    <div class="preview">
+        <h2>Next Piece</h2>
+        <canvas id="next-piece-1" width="120" height="120"></canvas>
+        <canvas id="next-piece-2" width="120" height="120"></canvas>
+        <canvas id="next-piece-3" width="120" height="120"></canvas>
+        <h2>Hold</h2>
+        <canvas id="hold-piece" width="120" height="120"></canvas>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById("tetris");
+const ctx = canvas.getContext("2d");
+const nextCanvases = [
+    document.getElementById("next-piece-1").getContext("2d"),
+    document.getElementById("next-piece-2").getContext("2d"),
+    document.getElementById("next-piece-3").getContext("2d"),
+];
+const holdCanvas = document.getElementById("hold-piece");
+const holdCtx = holdCanvas.getContext("2d");
+
+const ROWS = 20, COLS = 10, BLOCK_SIZE = 30;
+const PREVIEW_SIZE = 25;
+
+let score = 0;
+let level = 1;
+let linesCleared = 0;
+let dropSpeed = 1000;
+// let dropInterval = 500;
+let lastTime = 0;
+let dropCounter = 0;
+let softDrop = false;
+let holdPiece = null;
+let canHold = true;
+let board = Array.from({ length: ROWS }, () => Array(COLS).fill(0));
+
+const tetrominoes = [
+    { shape: [[1, 1, 1, 1]], color: "rgb(0, 255, 255)" },
+    { shape: [[1, 1], [1, 1]], color: "rgb(255, 255, 0)" },
+    { shape: [[0, 1, 0], [1, 1, 1]], color: "rgb(128, 0, 128)" },
+    { shape: [[1, 0, 0], [1, 1, 1]], color: "rgb(255, 165, 0)" },
+    { shape: [[0, 0, 1], [1, 1, 1]], color: "rgb(0, 0, 255)" },
+    { shape: [[0, 1, 1], [1, 1, 0]], color: "rgb(0, 255, 0)" },
+    { shape: [[1, 1, 0], [0, 1, 1]], color: "rgb(255, 0, 0)" }
+];
+
+let nextPieces = [createRandomPiece(), createRandomPiece(), createRandomPiece()];
+let piece = generatePiece();
+
+function generatePiece() {
+    let newPiece = structuredClone(nextPieces.shift());
+
+    if (nextPieces.length < 3) {
+        nextPieces.push(createRandomPiece());
+    }
+
+    if (!newPiece || !newPiece.shape) {
+        return createRandomPiece();
+    }
+
+    if (collisionAt(newPiece.x, newPiece.y, newPiece.shape)) {
+        alert("Game Over!");
+        resetGame();
+        return createRandomPiece();
+    }
+    
+    return newPiece;
+}
+
+function createRandomPiece() {
+    let tetro = tetrominoes[Math.floor(Math.random() * tetrominoes.length)];
+    return { shape: tetro.shape, color: tetro.color, x: 3, y: 0 };
+}
+
+function findGhostPosition() {
+    let ghostY = piece.y;
+
+    while (!collisionAt(piece.x, ghostY + 1, piece.shape)) {
+        ghostY++;
+    }
+
+    return ghostY;
+}
+
+function collisionAt(x, y, shape) {
+    return shape.some((row, dy) =>
+      row.some((cell, dx) =>
+        cell && (board[y + dy]?.[x + dx] !== 0 || y + dy >= ROWS)
+        )
+    );
+}
+
+function drawBlock(ctx, x, y, size, color) {
+    ctx.fillStyle = color;
+    ctx.fillRect(x * size, y * size, size, size);
+    ctx.strokeStyle = "#FFF";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x * size, y * size, size, size);
+}
+
+function drawBoard() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
+    ctx.lineWidth = 1.5;
+
+    for (let x = 0; x <= COLS; x++) {
+        ctx.beginPath();
+        ctx.moveTo(x * BLOCK_SIZE, 0);
+        ctx.lineTo(x * BLOCK_SIZE, canvas.height);
+        ctx.stroke();
+    }
+
+    for (let y = 0; y <= ROWS; y++) {
+        ctx.beginPath();
+        ctx.moveTo(0, y * BLOCK_SIZE);
+        ctx.lineTo(canvas.width, y * BLOCK_SIZE);
+        ctx.stroke();
+    }
+
+    if (piece && !collision()) {
+        let ghostY = findGhostPosition();
+        piece.shape.forEach((row, dy) => row.forEach((cell, dx) => {
+            if (cell) {
+                ctx.fillStyle = piece.color.replace("rgb", "rgba").replace(")", ", 0.3");
+                ctx.fillRect((piece.x + dx) * BLOCK_SIZE, (ghostY + dy) * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+    
+                ctx.strokeStyle = "rgba(255, 255, 255, 0.6)";
+                ctx.lineWidth = 2;
+                ctx.strokeRect((piece.x + dx) * BLOCK_SIZE, (ghostY + dy) * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+            }
+        }));
+    }
+
+    board.forEach((row, y) => row.forEach((cell, x) => {
+        if (cell) drawBlock(ctx, x, y, BLOCK_SIZE, cell);
+    }));
+    piece.shape.forEach((row, dy) => row.forEach((cell, dx) => {
+        if (cell) drawBlock(ctx, piece.x + dx, piece.y + dy, BLOCK_SIZE, piece.color);
+    }));
+}
+
+function drawNextPieces() {
+    nextCanvases.forEach((ctx, index) => {
+        ctx.clearRect(0, 0, 120, 120);
+        if (!nextPieces[index]) return;
+
+        const piece = nextPieces[index];
+        if (!piece.shape) return;
+
+        const shape = nextPieces[index].shape;
+        const color = nextPieces[index].color;
+        const offsetX = (4 - shape[0].length) / 2;
+        const offsetY = (4 - shape.length) / 2;
+
+        shape.forEach((row, dy) => row.forEach((cell, dx) => {
+            if (cell) drawBlock(ctx, dx + offsetX, dy, PREVIEW_SIZE, color);
+        }));
+    });
+}
+
+function drawHoldPiece() {
+    holdCtx.clearRect(0, 0, holdCanvas.width, holdCanvas.height);
+    if (!holdPiece) return;
+    const shape = holdPiece.shape;
+    const offsetX = (4 - shape[0].length) / 2;
+    shape.forEach((row, dy) => row.forEach((cell, dx) => {
+        if (cell) drawBlock(holdCtx, dx + offsetX, dy, PREVIEW_SIZE, holdPiece.color);
+    }));
+}
+
+function movePiece(dx, dy) {
+    let initialY = piece.y;
+
+    piece.x += dx;
+    piece.y += dy;
+
+    if (collision()) {
+        piece.x -= dx;
+        piece.y -= dy;
+        if (dy > 0) mergePiece();
+    } else if (dy > 0 && softDrop) {
+        let rowsDropped = piece.y - initialY;
+        score += rowsDropped;
+        document.getElementById("score").textContent = score;
+    }
+}
+
+function rotatePiece() {
+    const temp = piece.shape[0].map((_, i) => piece.shape.map(row => row[i])).reverse();
+    const oldShape = piece.shape;
+    piece.shape = temp;
+
+    let offsets = [-1, 1, -2, 2];
+
+    if (collision()) {
+        for (let offset of offsets) {
+            piece.x += offset;
+            if (!collision()) return;
+            piece.x -= offset;
+        }
+        piece.shape = oldShape;
+    }
+}
+
+function hold() {
+    if (!canHold) return;
+    let temp = structuredClone(piece);
+    if (holdPiece) {
+        piece = structuredClone(holdPiece);
+        piece.x = 3;
+        piece.y = piece.shape.length === 4 ? -1 : 0;
+    } else {
+        piece = generatePiece();
+        // nextPieces.push(createRandomPiece());
+        // drawNextPieces();
+    }
+    holdPiece = temp;
+    canHold = false;
+    drawHoldPiece();
+}
+
+function collision() {
+    return piece.shape.some((row, dy) => 
+        row.some((cell, dx) => 
+            cell && (board[piece.y + dy]?.[piece.x + dx] !== 0 || piece.y + dy >= ROWS)
+        )
+    );
+}
+
+function mergePiece() {
+    piece.shape.forEach((row, dy) =>
+        row.forEach((cell, dx) => {
+            if (cell) board[piece.y + dy][piece.x + dx] = piece.color;
+        })
+    );
+
+    clearRows();
+    canHold = true;
+
+    setTimeout(() => {
+        // nextPieces.push(createRandomPiece());
+        piece = structuredClone(generatePiece());
+        drawNextPieces();
+        dropCounter = 0;
+    }, 200);
+}
+
+function clearRows() {
+    let fullRows = board.reduce((acc, row, y) => row.every(cell => cell !== 0) ? [...acc,y] : acc, []);
+
+    if (fullRows.length > 0) {
+        let flashCount = 0;
+
+        let flashInterval = setInterval(() => {
+            flashCount++;
+            fullRows.forEach(y => {
+                for (let x = 0; x < COLS; x++) {
+                    board[y][x] = flashCount % 2 === 0 ? "white" : "gray";
+                }
+            });
+
+            drawBoard();
+
+            if (flashCount === 6) {
+                clearInterval(flashInterval);
+                setTimeout(() => {
+                    board = board.filter((_, y) => !fullRows.includes(y));
+                    while (board.length < ROWS) {
+                        board.unshift(Array(COLS).fill(0));
+                    }
+                    drawBoard();
+                }, 100); 
+            }
+        }, 100);
+    }
+}
+
+function hardDrop() {
+    let targetY = findGhostPosition();
+    let dropDistance = targetY - piece.y;
+
+    if (!collisionAt(piece.x, targetY, piece.shape)) {
+        piece.y = targetY;
+        score += dropDistance * 2;
+        document.getElementById("score").textContent = score;
+        drawBoard();
+
+        setTimeout(() => {
+            if (!collisionAt(piece.x, piece.y, piece.shape)) {
+                mergePiece();
+            }
+        }, 50);
+    }
+}
+
+function resetGame() {
+    board = Array.from({ length: ROWS }, () => Array(COLS).fill(0));
+    score = 0;
+    level = 1;
+    linesCleared = 0;
+    dropSpeed = 1000;
+    holdPiece = null;
+    canHold = true;
+    document.getElementById("score").textContent = score;
+    document.getElementById("level").textContent = level;
+    piece = generatePiece();
+    nextPiece = generatePiece();
+    drawNextPieces();
+    drawHoldPiece();
+}
+
+document.addEventListener("keydown", (e) => {
+    const key = e.key.toLowerCase();
+    if (key === "arrowleft") movePiece(-1, 0);
+    if (key === "arrowright") movePiece(1, 0);
+    if (key === "arrowdown") softDrop = true;
+    if (key === "arrowup") rotatePiece();
+    if (key === " ") hardDrop();
+    if (key === "c") hold();
+});
+
+document.addEventListener("keyup", (e) => {
+    if (e.key === "ArrowDown") softDrop = false;
+});
+
+function gameLoop(time = 0) {
+    const deltaTime = time - lastTime;
+    lastTime = time;
+    dropCounter += deltaTime;
+
+    let effectiveDropSpeed = softDrop ? Math.max(10, dropSpeed / 10) : dropSpeed;
+
+    if (piece && dropCounter > effectiveDropSpeed) {
+        movePiece(0, 1);
+        dropCounter = 0;
+    }
+    drawBoard();
+    requestAnimationFrame(gameLoop);
+}
+
+drawNextPieces();
+gameLoop();
+</script>
+</body>
+</html>
