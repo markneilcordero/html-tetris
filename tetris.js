@@ -48,7 +48,7 @@ const TETROMINOES = {
     ]
 };
 
-// Tetromino Colors
+
 const COLORS = {
     I: "rgb(0, 255, 255)",   
     J: "rgb(0, 0, 255)",     
@@ -58,6 +58,43 @@ const COLORS = {
     T: "rgb(128, 0, 128)",   
     Z: "rgb(255, 0, 0)"      
 };
+
+
+let isPressingLeft = false;
+let isPressingRight = false;
+let isPressingDown = false;
+
+
+const pressInterval = 150;
+
+
+function continuousPressLeft() {
+  if (!isPressingLeft) return;
+  moveTetromino(-1);
+  setTimeout(continuousPressLeft, pressInterval);
+}
+
+
+function continuousPressRight() {
+  if (!isPressingRight) return;
+  moveTetromino(1);
+  setTimeout(continuousPressRight, pressInterval);
+}
+
+
+function continuousPressDown() {
+  if (!isPressingDown) return;
+  const newY = activeTetromino.y + 1;
+  if (!collisionAt(activeTetromino.x, newY, activeTetromino.shape)) {
+    activeTetromino.y = newY;
+    score += 1;
+    document.getElementById("score").innerText = score;
+  } else {
+    placeTetromino();
+  }
+  setTimeout(continuousPressDown, pressInterval);
+}
+
 
 
 function createTetromino() {
@@ -577,6 +614,79 @@ document.getElementById("hold").addEventListener("click", () => holdTetromino())
 function movePiece(direction) {
     console.log(`Move piece ${direction > 0 ? "right" : "left"}`);
 }
+
+const btnLeft = document.getElementById("left");
+btnLeft.addEventListener("mousedown", (e) => {
+  e.preventDefault();
+  if (!isPressingLeft) {
+    isPressingLeft = true;
+    continuousPressLeft();
+  }
+});
+btnLeft.addEventListener("mouseup", (e) => {
+  e.preventDefault();
+  isPressingLeft = false;
+});
+btnLeft.addEventListener("touchstart", (e) => {
+  e.preventDefault();
+  if (!isPressingLeft) {
+    isPressingLeft = true;
+    continuousPressLeft();
+  }
+});
+btnLeft.addEventListener("touchend", (e) => {
+  e.preventDefault();
+  isPressingLeft = false;
+});
+
+const btnRight = document.getElementById("right");
+btnRight.addEventListener("mousedown", (e) => {
+  e.preventDefault();
+  if (!isPressingRight) {
+    isPressingRight = true;
+    continuousPressRight();
+  }
+});
+btnRight.addEventListener("mouseup", (e) => {
+  e.preventDefault();
+  isPressingRight = false;
+});
+btnRight.addEventListener("touchstart", (e) => {
+  e.preventDefault();
+  if (!isPressingRight) {
+    isPressingRight = true;
+    continuousPressRight();
+  }
+});
+btnRight.addEventListener("touchend", (e) => {
+  e.preventDefault();
+  isPressingRight = false;
+});
+
+const btnDown = document.getElementById("down");
+btnDown.addEventListener("mousedown", (e) => {
+  e.preventDefault();
+  if (!isPressingDown) {
+    isPressingDown = true;
+    continuousPressDown();
+  }
+});
+btnDown.addEventListener("mouseup", (e) => {
+  e.preventDefault();
+  isPressingDown = false;
+});
+btnDown.addEventListener("touchstart", (e) => {
+  e.preventDefault();
+  if (!isPressingDown) {
+    isPressingDown = true;
+    continuousPressDown();
+  }
+});
+btnDown.addEventListener("touchend", (e) => {
+  e.preventDefault();
+  isPressingDown = false;
+});
+
 
 // function softDrop() {
 //     console.log("Soft drop");
