@@ -155,13 +155,25 @@ function drawNextPieces() {
         const { shape, color } = tetromino;
         nextCtx.fillStyle = color;
 
+        const shapeWidth = shape[0].length;
+        const shapeHeight = shape.length;
+
+        const pieceTopOffset = index * 70 + 20;
+
+        const pieceLeftOffset = (nextCanvas.width - shapeWidth * 20) / 2;
+
         shape.forEach((row, rowIndex) => {
             row.forEach((cell, colIndex) => {
                 if (cell) {
-                    nextCtx.fillRect((colIndex * 20) + 30, (rowIndex * 20) + (index * 60), 20, 20);
+                    const xPos = pieceLeftOffset + colIndex * 20;
+                    const yPos = pieceTopOffset + rowIndex * 20;
+
+                    nextCtx.fillRect(xPos, yPos, 20, 20);
+                    // nextCtx.fillRect((colIndex * 20) + 30, (rowIndex * 20) + (index * 60), 20, 20);
                     nextCtx.strokeStyle = "#FFF";
                     nextCtx.lineWidth = 1.5;
-                    nextCtx.strokeRect((colIndex * 20) + 30, (rowIndex * 20) + (index * 60), 20, 20);
+                    // nextCtx.strokeRect((colIndex * 20) + 30, (rowIndex * 20) + (index * 60), 20, 20);
+                    nextCtx.strokeRect(xPos, yPos, 20, 20);
                 }
             });
         });
@@ -473,13 +485,27 @@ function drawHoldPiece() {
     const { shape, color } = holdPiece;
     holdCtx.fillStyle = color;
 
+    const shapeWidth = shape[0].length;
+    const shapeHeight = shape.length;
+
+    const cellSize = 20;
+
+    const leftOffset = (holdCanvas.width - shapeWidth * cellSize) / 2;
+
+    const topOffset = (holdCanvas.height - shapeHeight * cellSize) / 2;
+
     shape.forEach((row, rowIndex) => {
         row.forEach((cell, colIndex) => {
             if (cell) {
-                holdCtx.fillRect((colIndex * 20) + 10, (rowIndex * 20) + 10, 20, 20);
+                const xPos = leftOffset + colIndex * cellSize;
+                const yPos = topOffset + rowIndex * cellSize;
+                
+                holdCtx.fillRect(xPos, yPos, cellSize, cellSize);
+                // holdCtx.fillRect((colIndex * 20) + 10, (rowIndex * 20) + 10, 20, 20);
                 holdCtx.strokeStyle = "#FFF";
                 holdCtx.lineWidth = 1.5;
-                holdCtx.strokeRect((colIndex * 20) + 10, (rowIndex * 20) + 10, 20, 20);
+                // holdCtx.strokeRect((colIndex * 20) + 10, (rowIndex * 20) + 10, 20, 20);
+                holdCtx.strokeRect(xPos, yPos, cellSize, cellSize);
             }
         });
     });

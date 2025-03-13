@@ -55,9 +55,9 @@
     .hold-section,
     .next-section,
     .score-section {
-      background: #111;
-      border: 2px solid #555;
-      border-radius: 8px;
+      /* background: #111; */
+      /* border: 2px solid #555; */
+      /* border-radius: 8px; */
       padding: 10px;
       display: flex;
       flex-direction: column;
@@ -81,11 +81,19 @@
 
     /* 3) Score details (unchanged) */
     .score-details {
+      background: #222222;
+      border: 2px solid #fff;
+      padding: 0 16px;
       margin-top: 10px;
       text-align: center;
     }
     .score-details p {
-      margin: 5px 0;
+      margin: 8px 0;
+    }
+    .score-details span {
+      padding: 0 16px;
+      border-radius: 4px;
+      background: black;
     }
 
     /* 
@@ -190,9 +198,9 @@
       <div class="score-section" style="margin-top: 15px;">
         <h2>Score</h2>
         <div class="score-details">
-          <p>Score: <span id="score">0</span></p>
-          <p>Level: <span id="level">1</span></p>
-          <p>Lines: <span id="lines">0</span></p>
+          <p>Score <br/><span id="score">0</span></p>
+          <p>Level <br/><span id="level">1</span></p>
+          <p>Lines <br/><span id="lines">0</span></p>
         </div>
       </div>
     </div>
@@ -205,7 +213,7 @@
     <!-- RIGHT: NEXT + SCORE -->
     <div class="next-section">
       <h2>Next</h2>
-      <canvas id="next-piece" class="next-canvas" width="120" height="180"></canvas>
+      <canvas id="next-piece" class="next-canvas" width="120" height="220"></canvas>
     </div>
 
     <!-- BOTTOM: CONTROLS (spans all columns) -->
