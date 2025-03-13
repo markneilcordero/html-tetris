@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Tetris Game</title>
   <style>
+    /* Your existing CSS from your code, with minimal changes shown below */
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -20,36 +22,24 @@
       min-height: 100vh;
     }
 
-    /* 
-      1) MAIN LAYOUT: 3 columns (Hold - Board - Next/Score)
-         for both Desktop and Mobile 
-    */
+    /* 1) MAIN LAYOUT: 3 columns (unchanged) */
     .game-wrapper {
       display: grid;
-      grid-template-columns: 200px auto 200px; /* 3 columns by default */
+      grid-template-columns: 200px auto 200px;
       grid-gap: 10px;
       padding: 10px;
       width: 100%;
       max-width: 1100px;
     }
-
-    /*
-      2) On MOBILE (max-width: 768px),
-         we STILL keep 3 columns, but each is narrower.
-         We also scale down the Tetris board and side sections.
-    */
     @media (max-width: 768px) {
       .game-wrapper {
-        grid-template-columns: 80px auto 80px; /* narrower columns */
+        grid-template-columns: 80px auto 80px;
       }
-
-      /* Shrink the Tetris board */
+      /* Shrink Tetris board & side canvases for mobile, as you already do */
       #tetris {
-        width: 200px;   /* Force a narrower board */
-        height: auto;   /* Keep aspect ratio */
+        width: 200px;
+        height: auto;
       }
-
-      /* Optionally shrink the hold/next canvas too */
       .hold-canvas {
         width: 60px !important;
         height: 60px !important;
@@ -60,9 +50,7 @@
       }
     }
 
-    /* 
-      3) Sections: HOLD, BOARD, NEXT, SCORE
-    */
+    /* 2) Tetris board, hold, next sections (unchanged) */
     .hold-section,
     .next-section,
     .score-section {
@@ -74,29 +62,23 @@
       flex-direction: column;
       align-items: center;
     }
-
-    /* The center board */
     .board-section {
       display: flex;
       justify-content: center;
       align-items: center;
       position: relative;
     }
-
-    /* The Tetris canvas */
     #tetris {
       border: 4px solid #fff;
       background-color: #111;
     }
-
-    /* Side canvases */
     .hold-canvas,
     .next-canvas {
       background: #222;
       border: 2px solid #fff;
     }
 
-    /* Score details */
+    /* 3) Score details (unchanged) */
     .score-details {
       margin-top: 10px;
       text-align: center;
@@ -106,11 +88,13 @@
     }
 
     /* 
-      4) CONTROLS at the bottom (span all columns)
+      4) CONTROLS:
+         - Desktop: simple row (flex)
+         - Mobile: arrow layout (grid)
     */
     .controls {
-      grid-column: 1 / -1; /* span all 3 columns */
-      display: flex;
+      grid-column: 1 / -1; /* span all columns */
+      display: flex;       /* row by default */
       justify-content: center;
       gap: 10px;
       margin-top: 10px;
@@ -130,8 +114,47 @@
     }
 
     /* 
-      5) GAME OVER POPUP
+      4A) MOBILE-ONLY CONTROLS LAYOUT
+         We'll do a 3-column x 3-row grid to arrange them
+         in an arrow-key shape.
     */
+    @media (max-width: 768px) {
+      .controls {
+        display: grid;
+        grid-template-columns: 60px 60px 60px; /* 3 columns of 60px each */
+        grid-template-rows: 60px 60px 60px;    /* 3 rows of 60px each */
+        gap: 5px;
+        justify-content: center;
+        align-content: center;
+      }
+      /* Position each button in a "keypad" shape */
+      #rotate {
+        grid-column: 2; /* middle column */
+        grid-row: 1;    /* top row */
+      }
+      #left {
+        grid-column: 1;
+        grid-row: 2;
+      }
+      #down {
+        grid-column: 2;
+        grid-row: 2;
+      }
+      #right {
+        grid-column: 3;
+        grid-row: 2;
+      }
+      #hard-drop {
+        grid-column: 2;
+        grid-row: 3;   /* bottom middle */
+      }
+      #hold {
+        grid-column: 1;
+        grid-row: 3;   /* bottom left or somewhere else you prefer */
+      }
+    }
+
+    /* 5) GAME OVER POPUP (unchanged) */
     #game-over {
       display: none;
       position: fixed;
@@ -187,6 +210,9 @@
 
     <!-- BOTTOM: CONTROLS (spans all columns) -->
     <div class="controls">
+      <!-- The same 6 buttons, 
+           but arranged in a row on desktop,
+           and an arrow-key shape on mobile. -->
       <button id="rotate">⤴️</button>
       <button id="left">⬅️</button>
       <button id="down">⬇️</button>
