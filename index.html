@@ -1,124 +1,176 @@
-<!Doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Tetris Game</title>
 <style>
-body {
+  body {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
+    justify-content: center;
     height: 100vh;
     background-color: #000;
     margin: 0;
     overflow: hidden;
-}
-canvas {
+    font-family: Arial, sans-serif;
+  }
+
+  .scoreboard {
+    text-align: center;
+    color: white;
+    margin-bottom: 10px;
+  }
+  .scoreboard h2,
+  .scoreboard p {
+    margin: 5px 0;
+  }
+
+  .game-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-direction: column; /* Stacked on small screens */
+  }
+
+  .hold-next-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    align-items: center;
+    width: 100%;
+  }
+
+  .piece-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+  }
+  .piece-container canvas {
+    background-color: #222;
+    border: 2px solid white;
+  }
+
+  canvas#tetris {
     border: 4px solid #fff;
     background-color: #111;
-}
-.controls {
+  }
+
+  .controls {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    margin-top: 15px;
+  }
+  .row {
+    display: flex;
     justify-content: center;
-    gap: 10px;
-    margin-top: 10px;
-}
-button {
-    width: 60px;
-    height: 60px;
-    font-size: 20px;
+    gap: 5px;
+  }
+  button {
+    width: 50px;
+    height: 50px;
+    font-size: 18px;
     border: none;
-    border-radius: 10px;
+    border-radius: 8px;
     background-color: #333;
     color: white;
-}
-button:active {
+  }
+  button:active {
     background-color: #555;
-}
-.row {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-}
-.scoreboard {
-    position: absolute;
-    top: 20px;
+  }
+
+  /* Game Over Popup */
+  #game-over {
+    display: none;
+    position: fixed;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
     color: white;
-    font-size: 24px;
-    font-family: Arial, sans-serif;
-}
-.next-piece-container {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    color: white;
-    font-size: 20px;
-    font-family: Arial, sans-serif;
+    padding: 20px;
     text-align: center;
-}
-#next-piece {
-    background-color: #222;
-    border: 2px solid white;
-}
-.hold-piece-container {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    color: white;
-    font-size: 20px;
-    font-family: Arial, sans-serif;
-    text-align: center;
-}
-#hold-piece {
-    background-color: #222;
-    border: 2px solid white;
-}
+    border-radius: 10px;
+  }
+  #game-over button {
+    width: 100px;
+    height: 40px;
+    font-size: 18px;
+    background-color: red;
+    border-radius: 5px;
+    margin-top: 10px;
+  }
+
+  /* Larger Screens */
+  @media (min-width: 600px) {
+    .game-container {
+      flex-direction: row;
+      align-items: flex-start;
+    }
+    .hold-next-container {
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+    .controls {
+      margin-top: 0;
+    }
+  }
 </style>
 </head>
 <body>
-<canvas id="tetris"></canvas>
 
+<!-- Scoreboard at the top -->
 <div class="scoreboard">
-    <h2>Score: <span id="score">0</span></h2>
-    <p>Level: <span id="level">1</span></p>
+  <h2>Score: <span id="score">0</span></h2>
+  <p>Level: <span id="level">1</span></p>
 </div>
 
-<div id="game-over" style="display: none; position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.8);
-    color: white; padding: 20px; text-align: center;">
-    <h1>Game Over!</h1>
-    <p>Your Score: <span id="final-score">0</span></p>
-    <p>High Score: <span id="high-score">0</span></p>
-    <button onclick="resetGame()">Restart</button>
-</div>
+<!-- Main game container -->
+<div class="game-container">
+  <!-- Hold / Tetris / Next row -->
+  <div class="hold-next-container">
+    <div class="piece-container">
+      <h2>Hold</h2>
+      <canvas id="hold-piece" width="80" height="80"></canvas>
+    </div>
 
-<div class="next-piece-container">
-    <h2>Next Pieces</h2>
-    <canvas id="next-piece" width="120" height="180"></canvas>
-</div>
+    <!-- Only ONE Tetris board canvas -->
+    <canvas id="tetris"></canvas>
 
-<div class="hold-piece-container">
-    <h2>Hold</h2>
-    <canvas id="hold-piece" width="80" height="80"></canvas>
-</div>
+    <div class="piece-container">
+      <h2>Next</h2>
+      <canvas id="next-piece" width="120" height="180"></canvas>
+    </div>
+  </div>
 
-<div class="controls">
+  <!-- Controls below (on small screens) or to the side (on wide screens) -->
+  <div class="controls">
     <div class="row">
-        <button id="rotate">⤴️</button>
+      <button id="rotate">⤴️</button>
     </div>
     <div class="row">
-        <button id="left">⬅️</button>
-        <button id="down">⬇️</button>
-        <button id="right">➡️</button>
+      <button id="left">⬅️</button>
+      <button id="down">⬇️</button>
+      <button id="right">➡️</button>
     </div>
     <div class="row">
-        <button id="hard-drop">⏬</button>
-        <button id="hold">🛑</button>
+      <button id="hard-drop">⏬</button>
+      <button id="hold">🛑</button>
     </div>
+  </div>
+</div>
+
+<!-- Game Over Popup -->
+<div id="game-over">
+  <h1>Game Over!</h1>
+  <p>Your Score: <span id="final-score">0</span></p>
+  <p>High Score: <span id="high-score">0</span></p>
+  <button onclick="resetGame()">Restart</button>
 </div>
 
 <script src="tetris.js"></script>
