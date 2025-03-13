@@ -364,7 +364,7 @@ function animateRowClearing(rowsToClear) {
         //         removeRows(rowsToClear);
         //     }, 100);
         // }
-    }, 100);
+    }, 30);
 }
 
 function drawFlashOverlay() {
