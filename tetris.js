@@ -309,6 +309,8 @@ function clearFullRows() {
         score += rowsToClear.length * 100;
         document.getElementById("score").innerText = score;
 
+        document.getElementById("lines").innerText = rowsCleared;
+
         if (rowsCleared >= level * 10) {
             levelUp();
         }
