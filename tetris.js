@@ -510,7 +510,6 @@ function drawHoldPiece() {
     const cellSize = 20;
 
     const leftOffset = (holdCanvas.width - shapeWidth * cellSize) / 2;
-
     const topOffset = (holdCanvas.height - shapeHeight * cellSize) / 2;
 
     shape.forEach((row, rowIndex) => {
