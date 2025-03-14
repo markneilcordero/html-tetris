@@ -451,7 +451,21 @@ function rotateTetromino() {
         activeTetromino.shape.map(row => row[index]).reverse()
     );
 
-    if (!collisionAt(activeTetromino.x, activeTetromino.y, rotatedShape)) {
+    let offset = 0;
+    let foundValid = false;
+    const maxOffset = activeTetromino.shape[0].length;
+
+    while (Math.abs(offset) <= maxOffset) {
+        if (!collisionAt(activeTetromino.x + offset, activeTetromino.y, rotatedShape)) {
+            // activeTetromino.shape = rotatedShape;
+            foundValid = true;
+            break;
+        }
+        offset = offset > 0 ? -offset : 1 - offset;
+    }
+    
+    if (foundValid) {
+        activeTetromino.x += offset;
         activeTetromino.shape = rotatedShape;
     }
 }
