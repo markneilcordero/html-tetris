@@ -46,8 +46,8 @@
         height: 90px !important;
       }
       .next-canvas {
-        width: 80px !important;
-        height: 300px !important;
+        width: 90px !important;
+        height: 350px !important;
       }
     }
 
@@ -152,12 +152,17 @@
     @media (max-width: 768px) {
       .controls {
         display: grid;
-        grid-template-columns: 60px 60px 60px; /* 3 columns of 60px each */
-        grid-template-rows: 60px 60px 60px;    /* 3 rows of 60px each */
-        gap: 5px;
+        grid-template-columns: 80px 80px 80px; /* 3 columns of 60px each */
+        grid-template-rows: 80px 80px 80px;    /* 3 rows of 60px each */
+        gap: 8px;
         justify-content: center;
         align-content: center;
       }
+      .controls button {
+    width: 70px;      /* increase button size */
+    height: 70px;     
+    font-size: 24px;  /* bigger text if you want */
+  }
       /* Position each button in a "keypad" shape */
       #rotate {
         grid-column: 2; /* middle column */
