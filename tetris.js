@@ -144,7 +144,7 @@ function drawTetromino() {
     });
 }
 
-const nextPieces = [createTetromino(), createTetromino(), createTetromino()];
+const nextPieces = [createTetromino(), createTetromino(), createTetromino(), createTetromino(), createTetromino(), createTetromino()];
 const nextCanvas = document.getElementById("next-piece");
 const nextCtx = nextCanvas.getContext("2d");
 
