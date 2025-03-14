@@ -464,6 +464,8 @@ const holdCtx = holdCanvas.getContext("2d");
 function holdTetromino() {
     if (!canHold) return; 
 
+    canHold = false;
+
     if (holdPiece) {
         [activeTetromino, holdPiece] = [holdPiece, activeTetromino];
     } else {
@@ -471,8 +473,7 @@ function holdTetromino() {
         activeTetromino = nextPieces.shift();
         nextPieces.push(createTetromino());
     }
-
-    canHold = false; 
+    
     drawHoldPiece(); 
     drawNextPieces(); 
 }

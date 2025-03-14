@@ -189,6 +189,12 @@
       border: none;
       cursor: pointer;
     }
+    button {
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+    }
   </style>
 </head>
 <body>
@@ -243,5 +249,10 @@
   </div>
 
   <script src="tetris.js"></script>
+  <script>
+    document.querySelectorAll("button").forEach(button => {
+      button.addEventListener("contextmenu", (event) => event.preventDefault());
+    });
+  </script>
 </body>
 </html>
