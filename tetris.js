@@ -468,12 +468,16 @@ function holdTetromino() {
 
     if (holdPiece) {
         [activeTetromino, holdPiece] = [holdPiece, activeTetromino];
+        activeTetromino.y = 0;
+        activeTetromino.x = Math.floor(COLS / 2) - Math.floor(activeTetromino.shape[0].length / 2);
     } else {
         holdPiece = activeTetromino;
         activeTetromino = nextPieces.shift();
+        activeTetromino.y = 0;
+        activeTetromino.x = Math.floor(COLS / 2) - Math.floor(activeTetromino.shape[0].length / 2);
         nextPieces.push(createTetromino());
     }
-    
+
     drawHoldPiece(); 
     drawNextPieces(); 
 }
