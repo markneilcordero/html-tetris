@@ -434,6 +434,8 @@ function softDrop() {
 }
 
 function hardDrop() {
+    if (gameOverState) return;
+
     let dropDistance = 0;
 
     while (!collisionAt(activeTetromino.x, activeTetromino.y + 1, activeTetromino.shape)) {
@@ -609,13 +611,18 @@ function resetGame() {
     rowsCleared = 0;
     dropSpeed = 800;
 
+    document.getElementById("lines").innerText = rowsCleared;
+
     holdPiece = null;
     canHold = true;
     holdCtx.clearRect(0, 0, holdCanvas.width, holdCanvas.height);
 
     activeTetromino = createTetromino();
     nextPieces.length = 0;
-    nextPieces.push(createTetromino(), createTetromino(), createTetromino());
+    nextPieces.push(
+        createTetromino(), createTetromino(), createTetromino(),
+        createTetromino(), createTetromino(), createTetromino()
+    );
     
     document.getElementById("score").innerText = score;
     document.getElementById("level").innerText = level;
