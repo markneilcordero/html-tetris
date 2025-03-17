@@ -6,7 +6,7 @@ let gameOverState = false;
 
 document.getElementById("level").innerText = level;
 
-document.getElementById("high-score").innerText = localStorage.getItem("highScore") || 0;
+document.getElementById("left-high-score").innerText = localStorage.getItem("highScore") || 0;
 
 const canvas = document.getElementById("tetris");
 const ctx = canvas.getContext("2d");
@@ -587,6 +587,8 @@ function placeTetromino() {
     drawNextPieces();
 }
 
+let savedHighScore = parseInt(localStorage.getItem("highScore") || "0", 10);
+document.getElementById("left-high-score").innerText = savedHighScore;
 function gameOver() {
     gameOverState = true;
     cancelAnimationFrame(updateFrame);
@@ -596,11 +598,19 @@ function gameOver() {
     let highScore = parseInt(localStorage.getItem("highScore") || "0", 10);
     if (score > highScore) {
         localStorage.setItem("highScore", score);
-        document.getElementById("high-score").innerText = score;
+        document.getElementById("left-high-score").innerText = score;
+        document.getElementById("popup-high-score").innerText = score;
+    } else {
+        document.getElementById("left-high-score").innerText = highScore;
+        document.getElementById("popup-high-score").innerText = highScore;
     }
 }
 
 function resetGame() {
+    let storedHighScore = parseInt(localStorage.getItem("highScore") || "0", 10);
+    document.getElementById("left-high-score").innerText = storedHighScore;
+    document.getElementById("popup-high-score").innerText = storedHighScore;
+
     document.getElementById("game-over").style.display = "none";
     gameOverState = false;
 
