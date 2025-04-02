@@ -9,6 +9,7 @@
                maximum-scale=0.7,
                user-scalable=no">
   <title>Tetris Game</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
     /* Your existing CSS from your code, with minimal changes shown below */
 
@@ -148,6 +149,9 @@
     .controls button:active {
       background-color: #555;
     }
+    .controls button i {
+  font-size: 20px;
+}
 
     /* 
       4A) MOBILE-ONLY CONTROLS LAYOUT
@@ -263,12 +267,12 @@
       <!-- The same 6 buttons, 
            but arranged in a row on desktop,
            and an arrow-key shape on mobile. -->
-      <button id="rotate">⤴️</button>
-      <button id="left">⬅️</button>
-      <button id="down">⬇️</button>
-      <button id="right">➡️</button>
-      <button id="hard-drop">⏬</button>
-      <button id="hold">🛑</button>
+           <button id="rotate"><i class="fas fa-rotate-right"></i></button>
+           <button id="left"><i class="fas fa-arrow-left"></i></button>
+           <button id="down"><i class="fas fa-arrow-down"></i></button>
+           <button id="right"><i class="fas fa-arrow-right"></i></button>
+           <button id="hard-drop"><i class="fas fa-circle-down"></i></button>
+           <button id="hold"><i class="fas fa-box-archive"></i></button>
     </div>
   </div>
 
