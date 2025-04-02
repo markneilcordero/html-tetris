@@ -3,16 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport"
-      content="width=device-width,
-               initial-scale=0.7,
-               minimum-scale=0.7,
-               maximum-scale=0.7,
-               user-scalable=no">
+        content="width=device-width,
+                 initial-scale=0.7,
+                 minimum-scale=0.7,
+                 maximum-scale=0.7,
+                 user-scalable=no">
   <title>Tetris Game</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
-    /* Your existing CSS from your code, with minimal changes shown below */
-
     * {
       box-sizing: border-box;
       margin: 0;
@@ -28,7 +26,6 @@
       min-height: 100vh;
     }
 
-    /* 1) MAIN LAYOUT: 3 columns (unchanged) */
     .game-wrapper {
       display: grid;
       grid-template-columns: 150px auto 150px;
@@ -38,62 +35,61 @@
       max-width: 650px;
       margin: auto;
     }
+
     @media (max-width: 768px) {
       .game-wrapper {
         grid-template-columns: 80px auto 80px;
       }
-      /* Shrink Tetris board & side canvases for mobile, as you already do */
       #tetris {
         width: 200px;
         height: auto;
       }
-      .hold-canvas {
+      .hold-canvas,
+      .next-canvas {
         width: 90px !important;
         height: 90px !important;
       }
       .next-canvas {
-        width: 90px !important;
         height: 350px !important;
       }
     }
 
-    /* 2) Tetris board, hold, next sections (unchanged) */
     .hold-section,
     .next-section,
     .score-section {
-      /* background: #111; */
-      /* border: 2px solid #555; */
-      /* border-radius: 8px; */
       padding: 10px;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
+
     .board-section {
       display: flex;
       justify-content: center;
       align-items: center;
       position: relative;
     }
+
     .board-container {
-  width: 318px;             /* 10px bigger than your 300px canvas width */
-  height: 618px;            /* 10px bigger than your 600px canvas height */
-  border: 4px solid #fff;
-  border-radius: 8px;      /* the nice rounded corners */
-  background-color: #111;   /* typical Tetris background */
-  overflow: hidden;         /* so corners actually clip anything outside */
-  position: relative;
-}
-#tetris {
-  /* No border or radius here; the canvas stays rectangular */
-  border: none;
-  position: absolute;
-  top: 5px;       /* shift down so squares aren’t on the corner */
-  left: 5px;      /* shift right so squares aren’t on the corner */
-  width: 300px;   /* exact size of your Tetris board area */
-  height: 600px;  /* match your Tetris board height */
-  background: none;  /* let the container’s background show through */
-}
+      width: 318px;
+      height: 618px;
+      border: 4px solid #fff;
+      border-radius: 8px;
+      background-color: #111;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #tetris {
+      border: none;
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      width: 300px;
+      height: 600px;
+      background: none;
+    }
+
     .hold-canvas,
     .next-canvas {
       background: #222;
@@ -101,7 +97,6 @@
       border-radius: 8px;
     }
 
-    /* 3) Score details (unchanged) */
     .score-details {
       background: #222222;
       border: 2px solid #fff;
@@ -111,99 +106,97 @@
       width: 100px;
       border-radius: 8px;
     }
+
     .score-details p {
       margin: 8px 0;
-      text-align: center;
     }
+
     .score-details span {
       border-radius: 8px;
       background: black;
-      display: inline-block;  
+      display: inline-block;
       width: 50px;
       text-align: center;
       padding: 8px 0;
     }
 
-    /* 
-      4) CONTROLS:
-         - Desktop: simple row (flex)
-         - Mobile: arrow layout (grid)
-    */
+    /* 🎮 Gamepad-style Controls */
     .controls {
-      grid-column: 1 / -1; /* span all columns */
-      display: flex;       /* row by default */
-      justify-content: center;
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 80px 80px 80px;
+      grid-template-rows: 80px 80px 80px;
       gap: 10px;
+      justify-content: center;
       margin-top: 10px;
     }
+
     .controls button {
-      width: 50px;
-      height: 50px;
-      font-size: 18px;
-      background-color: #333;
+      width: 70px;
+      height: 70px;
+      font-size: 24px;
       border: none;
-      border-radius: 8px;
-      color: #fff;
+      border-radius: 12px;
+      color: white;
       cursor: pointer;
+      transition: 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
     }
-    .controls button:active {
-      background-color: #555;
-    }
+
     .controls button i {
-  font-size: 20px;
-}
-
-    /* 
-      4A) MOBILE-ONLY CONTROLS LAYOUT
-         We'll do a 3-column x 3-row grid to arrange them
-         in an arrow-key shape.
-    */
-    @media (max-width: 768px) {
-      .controls {
-        display: grid;
-        grid-template-columns: 80px 80px 80px; /* 3 columns of 60px each */
-        grid-template-rows: 80px 80px 80px;    /* 3 rows of 60px each */
-        gap: 8px;
-        justify-content: center;
-        align-content: center;
-      }
-      .controls button {
-    width: 70px;      /* increase button size */
-    height: 70px;     
-    font-size: 24px;  /* bigger text if you want */
-  }
-      /* Position each button in a "keypad" shape */
-      #rotate {
-        grid-column: 2; /* middle column */
-        grid-row: 1;    /* top row */
-      }
-      #left {
-        grid-column: 1;
-        grid-row: 2;
-      }
-      #down {
-        grid-column:2;
-        grid-row: 2;
-      }
-      #right {
-        grid-column: 3;
-        grid-row: 2;
-      }
-      #hard-drop {
-        grid-column: 2;
-        grid-row: 3;   /* bottom middle */
-      }
-      #hold {
-        grid-column: 1;
-        grid-row: 1;   /* bottom left or somewhere else you prefer */
-      }
+      font-size: 26px;
     }
 
-    /* 5) GAME OVER POPUP (unchanged) */
+    #rotate {
+      background-color: #ff9800;
+    }
+    #rotate:hover {
+      background-color: #e68900;
+    }
+
+    #left {
+      background-color: #03a9f4;
+    }
+    #left:hover {
+      background-color: #0288d1;
+    }
+
+    #down {
+      background-color: #4caf50;
+    }
+    #down:hover {
+      background-color: #388e3c;
+    }
+
+    #right {
+      background-color: #9c27b0;
+    }
+    #right:hover {
+      background-color: #7b1fa2;
+    }
+
+    #hard-drop {
+      background-color: #f44336;
+    }
+    #hard-drop:hover {
+      background-color: #d32f2f;
+    }
+
+    #hold {
+      background-color: #00bcd4;
+    }
+    #hold:hover {
+      background-color: #0097a7;
+    }
+
     #game-over {
       display: none;
       position: fixed;
-      top: 50%; left: 50%;
+      top: 50%;
+      left: 50%;
       transform: translate(-50%, -50%);
       background: rgba(0,0,0,0.8);
       padding: 20px;
@@ -211,6 +204,7 @@
       border-radius: 8px;
       z-index: 999;
     }
+
     #game-over button {
       margin-top: 10px;
       width: 100px;
@@ -221,11 +215,9 @@
       border: none;
       cursor: pointer;
     }
+
     button {
       user-select: none;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
       touch-action: manipulation;
     }
   </style>
@@ -262,17 +254,19 @@
       <canvas id="next-piece" class="next-canvas" width="120" height="440"></canvas>
     </div>
 
-    <!-- BOTTOM: CONTROLS (spans all columns) -->
+    <!-- CONTROLS: Gamepad Layout -->
     <div class="controls">
-      <!-- The same 6 buttons, 
-           but arranged in a row on desktop,
-           and an arrow-key shape on mobile. -->
-           <button id="rotate"><i class="fas fa-rotate-right"></i></button>
-           <button id="left"><i class="fas fa-arrow-left"></i></button>
-           <button id="down"><i class="fas fa-arrow-down"></i></button>
-           <button id="right"><i class="fas fa-arrow-right"></i></button>
-           <button id="hard-drop"><i class="fas fa-circle-down"></i></button>
-           <button id="hold"><i class="fas fa-box-archive"></i></button>
+      <button id="hold"><i class="fas fa-box-archive"></i></button>
+      <button id="rotate"><i class="fas fa-rotate-right"></i></button>
+      <div></div>
+
+      <button id="left"><i class="fas fa-arrow-left"></i></button>
+      <button id="down"><i class="fas fa-arrow-down"></i></button>
+      <button id="right"><i class="fas fa-arrow-right"></i></button>
+
+      <div></div>
+      <button id="hard-drop"><i class="fas fa-circle-down"></i></button>
+      <div></div>
     </div>
   </div>
 
