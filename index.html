@@ -12,6 +12,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
+    html, body {
+  height: 100%;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
     * {
       box-sizing: border-box;
       margin: 0;
@@ -353,5 +358,12 @@
       button.addEventListener("contextmenu", e => e.preventDefault());
     });
   </script>
+  <script>
+    // Scroll to bottom after content is fully loaded
+    window.addEventListener('load', () => {
+      window.scrollTo(0, document.body.scrollHeight);
+    });
+  </script>
+  
 </body>
 </html>
